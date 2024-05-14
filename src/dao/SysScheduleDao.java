@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 /**
-当前的类是SysUser的接口类，里面包含接口的定义
+当前的类是SysUser的接口类，里面包含接口的定义，一般来说对于每一个数据库中的表格都会有对应的Dao类存在
 作者：Kashing
  *
  */
