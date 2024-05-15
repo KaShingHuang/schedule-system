@@ -7,4 +7,12 @@ import pojo.SysUser;
  */
 public interface SysUserService {
     public int regist(SysUser sysUser);
+
+
+    /**
+     * 根据用户名返回对应的用户信息。
+     * @param username   用户名
+     * @return  查询得到的SysUser对象，如果用户名不存在，则返回null
+     */
+    SysUser findByUsername(String username);
 }

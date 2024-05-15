@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import pojo.SysUser;
 import service.Impl.SysUserServiceImpl;
 import service.SysUserService;
+import util.MD5Util;
 
 import java.io.IOException;
 
@@ -46,6 +47,28 @@ public class SysUserController extends BaseController{
             resp.sendRedirect("/login.html");
         }
         else resp.sendRedirect("/registFail.html");
+    }
 
+    /**
+     * 用户登录页面的处理接口
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     * @return  返回的是用户是否登录成功，成功跳转login.html,不成功根据原因分别跳转loginUsernameError.html和loginUserPwdError.html
+     */
+    protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        //接受客户端提交的参数
+        String username = req.getParameter("username");
+        String userPwd = req.getParameter("userPwd");
+        //根据用户名调用Service层获取对应的信息，分情况处理.
+        SysUser sysuser=userService.findByUsername(username);
+        if(null == sysuser) {
+            resp.sendRedirect("/loginUsernameError.html");
+            //若用户存在，判断密码是否对应上
+        }else if(!MD5Util.encrypt(userPwd).equals((sysuser.getUserPwd()))){
+            resp.sendRedirect("/loginUserPwdError.html");
+        }
+        else resp.sendRedirect("/showSchedule.html");
     }
 }

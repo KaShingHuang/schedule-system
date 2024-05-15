@@ -3,9 +3,10 @@ package service.Impl;
 import dao.SysUserDao;
 import dao.impl.SysUserDaoImpl;
 import pojo.SysUser;
+import service.SysUserService;
 import util.MD5Util;
 
-public class SysUserServiceImpl {
+public class SysUserServiceImpl implements SysUserService {
     private SysUserDao userDao=new SysUserDaoImpl();
 
     /**
@@ -19,5 +20,10 @@ public class SysUserServiceImpl {
         //调用Dao层的方法，将Sysuser信息存入数据库
         return userDao.addUser(sysUser);
 
+    }
+
+    @Override
+    public SysUser findByUsername(String username) {
+        return userDao.findByUsername(username);
     }
 }
