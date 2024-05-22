@@ -1,13 +1,18 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import common.Result;
+import common.ResultCodeEnum;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import pojo.SysUser;
 import service.Impl.SysUserServiceImpl;
 import service.SysUserService;
 import util.MD5Util;
+import util.WebUtil;
 
 import java.io.IOException;
 
@@ -28,6 +33,27 @@ public class SysUserController extends BaseController{
     }
     protected void find(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("Userfind");
+    }
+
+    /**
+     *  判断用户要注册的名字是否已经占用的方法
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     * @return 返回已占用或者未占用
+     */
+    protected void CheckUserNameUsed(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            //获取当前请求的用户名
+        String username = req.getParameter("username");
+        //调用服务层的方法，返回用户信息
+        SysUser sysuser = userService.findByUsername(username);
+        //判断信息是否为空，响应对应的信息
+        Result result=Result.ok(null);
+        if(sysuser!=null) result=Result.build(null, ResultCodeEnum.USERNAME_USED);
+        //将result对象转化为JSON对象传递给客户端,并且告诉客户端响应是一个JSON串
+        WebUtil.writeJson(resp,result);
+
     }
 
     /**
@@ -69,6 +95,11 @@ public class SysUserController extends BaseController{
         }else if(!MD5Util.encrypt(userPwd).equals((sysuser.getUserPwd()))){
             resp.sendRedirect("/loginUserPwdError.html");
         }
-        else resp.sendRedirect("/showSchedule.html");
+        else {
+            //登录成功之后吧用户信息放入session
+            HttpSession session = req.getSession();
+            session.setAttribute("sysUser", sysuser);
+            resp.sendRedirect("/showSchedule.html");
+        }
     }
 }
