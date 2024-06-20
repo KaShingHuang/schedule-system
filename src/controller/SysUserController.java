@@ -49,9 +49,17 @@ public class SysUserController extends BaseController{
         //调用服务层的方法，返回用户信息
         SysUser sysuser = userService.findByUsername(username);
         //判断信息是否为空，响应对应的信息
-        Result result=Result.ok(null);
-        if(sysuser!=null) result=Result.build(null, ResultCodeEnum.USERNAME_USED);
-        //将result对象转化为JSON对象传递给客户端,并且告诉客户端响应是一个JSON串
+        //封装结果对象
+        Result result=null;
+        if(null ==sysuser){
+            // 未占用,创建一个code为200的对象
+            result= Result.ok(null);
+        }else{
+            // 占用, 创建一个结果为505的对象
+            result= Result.build(null, ResultCodeEnum.USERNAME_USED);
+
+        }
+        // 将result对象转换成JSON并响应给客户端
         WebUtil.writeJson(resp,result);
 
     }
@@ -64,15 +72,18 @@ public class SysUserController extends BaseController{
      */
     protected void regist(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //接受客户端提交的参数
-        String UserName = req.getParameter("username");
-        String Pwd = req.getParameter("userPwd");
+        SysUser registUser = WebUtil.readJson(req, SysUser.class);
         //调用服务层方法，完成注册功能
-        int rows=userService.regist(new SysUser(null,UserName,Pwd));
+        int rows=userService.regist(registUser);
+        Result result =null;
         //根据注册的结果（成功，失败）进行页面跳转
-        if (rows>0){
-            resp.sendRedirect("/login.html");
+        if(rows>0){
+            result=Result.ok(null);
+        }else{
+            result =Result.build(null,ResultCodeEnum.USERNAME_USED);
         }
-        else resp.sendRedirect("/registFail.html");
+        WebUtil.writeJson(resp,result);
+
     }
 
     /**
@@ -85,21 +96,25 @@ public class SysUserController extends BaseController{
      */
     protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //接受客户端提交的参数
-        String username = req.getParameter("username");
-        String userPwd = req.getParameter("userPwd");
-        //根据用户名调用Service层获取对应的信息，分情况处理.
-        SysUser sysuser=userService.findByUsername(username);
-        if(null == sysuser) {
-            resp.sendRedirect("/loginUsernameError.html");
-            //若用户存在，判断密码是否对应上
-        }else if(!MD5Util.encrypt(userPwd).equals((sysuser.getUserPwd()))){
-            resp.sendRedirect("/loginUserPwdError.html");
+        SysUser inputUser = WebUtil.readJson(req, SysUser.class);
+        // 调用服务层方法,根据用户名查询数据库中是否有一个用户
+        SysUser loginUser =userService.findByUsername(inputUser.getUsername());
+
+        Result result = null;
+
+        if(null == loginUser){
+            // 没有根据用户名找到用户,说明用户名有误
+            result=Result.build(null,ResultCodeEnum.USERNAME_ERROR);
+        }else if(! loginUser.getUserPwd().equals(MD5Util.encrypt(inputUser.getUserPwd()))){
+            // 用户密码有误,
+            result=Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
+        }else{
+            // 登录成功
+            result=Result.ok(null);
         }
-        else {
-            //登录成功之后吧用户信息放入session
-            HttpSession session = req.getSession();
-            session.setAttribute("sysUser", sysuser);
-            resp.sendRedirect("/showSchedule.html");
-        }
+
+        WebUtil.writeJson(resp,result);
+
     }
+
 }
