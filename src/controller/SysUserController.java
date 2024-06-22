@@ -15,6 +15,8 @@ import util.MD5Util;
 import util.WebUtil;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 一般在controller中会有增删查改的请求，
@@ -109,12 +111,19 @@ public class SysUserController extends BaseController{
             // 用户密码有误,
             result=Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
         }else{
+            // 登录成功,信息存入session
+            req.getSession().setAttribute("sysUser",loginUser);
             // 登录成功
-            result=Result.ok(null);
+            // 将密码请空后,将用户信息响应给客户端
+            loginUser.setUserPwd("");
+            Map<String, Object> data = new HashMap<>();
+            data.put("loginUser",loginUser);
+            result=Result.ok(data);
         }
 
         WebUtil.writeJson(resp,result);
-
     }
+
+
 
 }
