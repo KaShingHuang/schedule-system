@@ -34,8 +34,6 @@ public class JDBCUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
     /*1 向外提供连接池的方法*/
     public static DataSource getDataSource(){

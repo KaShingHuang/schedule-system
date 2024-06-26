@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 */
 @AllArgsConstructor
 @NoArgsConstructor
-@Data  //这个对应了重写hashcode euqals 和tostring方法
+@Data  //这个对应了重写hashcode euqals 和tostring，Getter和Setter方法
 public class SysSchedule {
     private Integer sid;
     private Integer uid;

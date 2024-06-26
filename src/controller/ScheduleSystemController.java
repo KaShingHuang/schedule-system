@@ -28,46 +28,50 @@ import java.util.Map;
 @WebServlet("/schedule/*")
 public class ScheduleSystemController extends BaseController {
     private ScheduleSystemService scheduleService=new ScheduleSystemServiceImpl();
-    protected void add(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("add");
-    }
-    protected void remove(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("remove");
-    }
-    protected void update(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("update");
-    }
-    protected void find(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("find");
-    }
 
-
+    /**
+     * 用户找到日程数据的方法
+     * @param req    获得的参数是用户的uid
+     * @return   返回根据用户的uid返回的日程数据
+     */
     protected void findAllSchedule(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int uid= Integer.parseInt(req.getParameter("uid"));
-        List<SysSchedule> itemList=scheduleService.findItemListByUid(uid);
+        int uid= Integer.parseInt(req.getParameter("uid"));   //getParameter返回的是String，要进行转型
+        List<SysSchedule> itemList=scheduleService.findItemListByUid(uid);//前端数据类型是一个List的类型，我们这里最终返回的结果数据也是List
         Map<String,Object> data=new HashMap<>();
         data.put("itemList",itemList);
         WebUtil.writeJson(resp, Result.ok(data));
     }
 
+    /**
+     * 前端showschedule页面中新增日程按钮对应的方法，可以新增一个默认初始化的日程数据
+     * @param req     需要使用的参数是用户的uid
+     * @return  不返回任何数据，响应处理成功的状态码
+     */
     protected void addDefaultSchedule(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int uid = Integer.parseInt(req.getParameter("uid"));
         //  调用服务层方法,为当前用户新增一个默认空数据
         scheduleService.addDefault(uid);
-
         WebUtil.writeJson(resp,Result.ok(null));
     }
 
-
+    /**    更新对应用户响应的日程数据
+     * @param req    需要的参数SysSchedule参数对象的内容
+     * @return 不返回任何数据，只返回处理成功的状态码
+     */
     protected void updateSchedule(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         SysSchedule sysSchedule = WebUtil.readJson(req, SysSchedule.class);
         // 调用服务层方法,更新数据
         scheduleService.updateSchedule(sysSchedule);
-
         // 响应成功
         WebUtil.writeJson(resp,Result.ok(null));
     }
 
+
+    /**
+     * 删除指定的日程数据
+     * @param req   接收用户要删除的对应的日程数据的sid
+     * @return 不返回任何数据，只返回处理成功的状态码
+     */
     protected void removeSchedule(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // 获取要删除的日程id
         int sid = Integer.parseInt(req.getParameter("sid"));

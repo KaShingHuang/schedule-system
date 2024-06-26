@@ -24,26 +24,11 @@ import java.util.Map;
 @WebServlet("/user/*")
 public class SysUserController extends BaseController{
     private SysUserServiceImpl userService=new SysUserServiceImpl();
-    protected void add(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Useradd");
-    }
-    protected void remove(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Userremove");
-    }
-    protected void update(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Userupdate");
-    }
-    protected void find(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Userfind");
-    }
 
     /**
      *  判断用户要注册的名字是否已经占用的方法
-     * @param req
-     * @param resp
-     * @throws ServletException
-     * @throws IOException
-     * @return 返回已占用或者未占用
+     * @param req     接收用户名作为参数
+     * @return 返回已占用或者未占用和对应的状态码
      */
     protected void CheckUserNameUsed(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             //获取当前请求的用户名
@@ -63,14 +48,13 @@ public class SysUserController extends BaseController{
         }
         // 将result对象转换成JSON并响应给客户端
         WebUtil.writeJson(resp,result);
-
     }
 
     /**
      * 接受用户注册请求的业务处理方法(业务接口，不是interface)
-     * @param req
+     * @param req  接收的参数是要注册的用户对象里面包含用户名和密码
      * @param resp
-     * @return 返回是否注册成功，如果注册成功的话转跳login页面，否则转跳registFail页面
+     * @return 返回是是否注册成功的状态码，若影响的行数大于0则注册成功，否则注册失败
      */
     protected void regist(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //接受客户端提交的参数
@@ -78,23 +62,19 @@ public class SysUserController extends BaseController{
         //调用服务层方法，完成注册功能
         int rows=userService.regist(registUser);
         Result result =null;
-        //根据注册的结果（成功，失败）进行页面跳转
+        //根据注册的结果（成功，失败）返回状态码
         if(rows>0){
             result=Result.ok(null);
         }else{
             result =Result.build(null,ResultCodeEnum.USERNAME_USED);
         }
         WebUtil.writeJson(resp,result);
-
     }
 
     /**
      * 用户登录页面的处理接口
-     * @param req
-     * @param resp
-     * @throws ServletException
-     * @throws IOException
-     * @return  返回的是用户是否登录成功，成功跳转login.html,不成功根据原因分别跳转loginUsernameError.html和loginUserPwdError.html
+     * @param req             接收的参数是用户的登录信息，包括账号和密码
+     * @return  返回的是用户是否登录成功，若成功将密码处理后将用户对象返回给客户端
      */
     protected void login(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //接受客户端提交的参数
@@ -120,7 +100,6 @@ public class SysUserController extends BaseController{
             data.put("loginUser",loginUser);
             result=Result.ok(data);
         }
-
         WebUtil.writeJson(resp,result);
     }
 

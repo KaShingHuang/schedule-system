@@ -29,11 +29,31 @@ public interface SysScheduleDao {
      */
     List<SysSchedule> findAll();
 
+    /**
+     *     根据用户的uid返回对应的日程记录列表
+     * @param uid
+     * @return   日程记录列表
+     */
     List<SysSchedule> findItemListByUid(int uid);
 
+    /**
+     * 根据用户的uid往数据库里面添加一条默认的日程记录
+     * @param uid
+     * @return   是否成功添加，成功为1，失败为0，即影响记录的行数
+     */
     Integer addDefault(int uid);
 
+    /**
+     * 根据日程对象的内容来更新对应的原始的记录的内容
+     * @param sysSchedule
+     * @return   返回影响记录的条数，即是否更新成功
+     */
     Integer updateSchedule(SysSchedule sysSchedule);
 
+    /**
+     * 根据日程记录的sid来删除对应的日程数据库里面的记录
+     * @param sid
+     * @return   影响记录的行数，即是否删除成功
+     */
     Integer removeBySid(int sid);
 }
